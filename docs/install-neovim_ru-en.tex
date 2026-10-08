@@ -1,0 +1,556 @@
+% Build: XeLaTeX (latexmk -xelatex). Fonts: Times New Roman, Courier New (Windows).
+% Rule: code blocks that would wrap in a narrow column are set full-width
+% (between \end{paracol} and \begin{paracol}{2}); all code blocks are ASCII only.
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=14mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Courier New}[Scale=0.88]
+\usepackage[russian,english]{babel}
+\usepackage{paracol}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black!35},
+  backgroundcolor=\color{black!4},
+  columns=fixed,
+  keepspaces=true,
+  showstringspaces=false,
+  aboveskip=4pt,
+  belowskip=4pt
+}
+\setlength{\columnsep}{7mm}
+\columnseprule=0.4pt
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{8pt}{2pt}
+
+\newcommand{\RU}{\selectlanguage{russian}}
+\newcommand{\EN}{\selectlanguage{english}}
+\newcommand{\key}[1]{\texttt{#1}}
+\newcommand{\wide}{\lstset{basicstyle=\ttfamily\footnotesize}}
+\newcommand{\narrow}{\lstset{basicstyle=\ttfamily\small}}
+
+\begin{document}
+\sloppy
+
+\begin{paracol}{2}
+\RU
+{\Large\bfseries Установка и настройка Neovim с нуля (Windows 11)\par}
+Пошаговая инструкция, как повторить эту конфигурацию на другом компьютере · октябрь 2026
+\switchcolumn
+\EN
+{\Large\bfseries Neovim setup from scratch (Windows 11)\par}
+A step-by-step guide to reproduce this configuration on another computer · October 2026
+\switchcolumn*
+
+\RU
+\section*{Что получится}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Neovim 0.12 с менеджером плагинов lazy.nvim.
+\item Подсветка кода (Treesitter), автодополнение (blink.cmp), поиск файлов и текста (Telescope), файловое дерево (nvim-tree), тема tokyonight, значки (Nerd Font).
+\item Подсказки, ошибки и переход к определению для Python (Pyright), Rust (rust-analyzer) и PowerShell (PowerShell Editor Services).
+\item Локальный ИИ-помощник: Ollama, модель qwen2.5-coder:7b и плагин codecompanion.nvim.
+\end{itemize}
+Нужен интернет. Для локальной модели желательна видеокарта с 8 ГБ памяти: без неё модель работает на процессоре и заметно медленнее. Все команды выполняются в PowerShell. После установки программ закройте PowerShell и откройте заново, чтобы обновились пути.
+
+Markdown и LaTeX описаны отдельно, в инструкции \key{install-markdown-latex}. Её читайте после этой.
+\switchcolumn
+\EN
+\section*{What you get}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Neovim 0.12 with the lazy.nvim plugin manager.
+\item Syntax highlighting (Treesitter), autocompletion (blink.cmp), file and text search (Telescope), a file tree (nvim-tree), the tokyonight theme, icons (Nerd Font).
+\item Hints, errors and go-to-definition for Python (Pyright), Rust (rust-analyzer) and PowerShell (PowerShell Editor Services).
+\item A local AI assistant: Ollama, the qwen2.5-coder:7b model and the codecompanion.nvim plugin.
+\end{itemize}
+You need an internet connection. For the local model a graphics card with 8 GB of memory is recommended: without one the model runs on the CPU and is noticeably slower. All commands are run in PowerShell. After installing programs, close PowerShell and open it again so the paths are updated.
+
+Markdown and LaTeX are covered separately, in the guide \key{install-markdown-latex}. Read it after this one.
+\switchcolumn*
+
+\RU
+\section*{Шаг 1. Установить программы}
+\begin{lstlisting}
+winget install Neovim.Neovim
+winget install Git.Git
+winget install Python.Python.3.12
+winget install OpenJS.NodeJS
+winget install BurntSushi.ripgrep.MSVC
+winget install tree-sitter.tree-sitter-cli
+winget install DEVCOM.JetBrainsMonoNerdFont
+winget install Rustlang.Rustup
+winget install Ollama.Ollama
+\end{lstlisting}
+Заметки:
+\begin{itemize}\setlength\itemsep{1pt}
+\item Если winget не находит пакет, найдите его командой \key{winget search имя}: идентификаторы иногда меняются.
+\item Node.js нужен для Pyright, Python нужен для разбора Python-кода, Rust ставится через rustup.
+\item Для сборки парсеров Treesitter нужен компилятор C. На исходном компьютере стоит Visual Studio. Если \key{:TSInstall} пожалуется на отсутствие компилятора, поставьте Build Tools для Visual Studio с компонентом «Разработка классических приложений на C++» или другой компилятор (например, zig).
+\item Буфер обмена Neovim обычно работает через win32yank, который идёт в комплекте. Проверка: \key{:checkhealth vim.provider}.
+\end{itemize}
+\switchcolumn
+\EN
+\section*{Step 1. Install the programs}
+\begin{lstlisting}
+winget install Neovim.Neovim
+winget install Git.Git
+winget install Python.Python.3.12
+winget install OpenJS.NodeJS
+winget install BurntSushi.ripgrep.MSVC
+winget install tree-sitter.tree-sitter-cli
+winget install DEVCOM.JetBrainsMonoNerdFont
+winget install Rustlang.Rustup
+winget install Ollama.Ollama
+\end{lstlisting}
+Notes:
+\begin{itemize}\setlength\itemsep{1pt}
+\item If winget cannot find a package, search for it with \key{winget search name}: identifiers sometimes change.
+\item Node.js is needed for Pyright, Python is needed for parsing Python code, and Rust is installed via rustup.
+\item Building Treesitter parsers requires a C compiler. The original computer has Visual Studio. If \key{:TSInstall} complains about a missing compiler, install Build Tools for Visual Studio with the ``Desktop development with C++'' workload, or another compiler (for example, zig).
+\item The Neovim clipboard usually works through win32yank, which is bundled. Check: \key{:checkhealth vim.provider}.
+\end{itemize}
+\switchcolumn*
+
+\RU
+\section*{Шаг 2. Выбрать шрифт в Windows Terminal}
+\begin{enumerate}\setlength\itemsep{1pt}
+\item Нажмите \key{Ctrl+,} (откроются настройки).
+\item Слева в разделе «Профили» выберите «По умолчанию», затем вкладку «Оформление».
+\item В поле «Шрифт» выберите JetBrainsMono Nerd Font и нажмите «Сохранить».
+\end{enumerate}
+Если шрифта нет в списке, закройте Windows Terminal полностью и откройте заново. Без этого шага вместо значков будут ромбики.
+\switchcolumn
+\EN
+\section*{Step 2. Choose the font in Windows Terminal}
+\begin{enumerate}\setlength\itemsep{1pt}
+\item Press \key{Ctrl+,} (the settings open).
+\item On the left, under ``Profiles'', choose ``Defaults'', then the ``Appearance'' tab.
+\item In the ``Font face'' field choose JetBrainsMono Nerd Font and click ``Save''.
+\end{enumerate}
+If the font is not in the list, close Windows Terminal completely and open it again. Without this step you will see diamonds instead of icons.
+\switchcolumn*
+
+\RU
+\section*{Шаг 3. Перенести конфиг}
+Конфиг лежит в папке \key{\$env:LOCALAPPDATA/nvim}. Если она уже есть, переименуйте её:
+\begin{lstlisting}
+Rename-Item $env:LOCALAPPDATA/nvim nvim.old
+\end{lstlisting}
+\textbf{Вариант А: из GitHub.} Команды ниже выполните под текстом.
+\switchcolumn
+\EN
+\section*{Step 3. Bring the config over}
+The config lives in the folder \key{\$env:LOCALAPPDATA/nvim}. If it already exists, rename it:
+\begin{lstlisting}
+Rename-Item $env:LOCALAPPDATA/nvim nvim.old
+\end{lstlisting}
+\textbf{Option A: from GitHub.} Run the commands below the text.
+\end{paracol}
+
+\wide
+\begin{lstlisting}
+cd $env:LOCALAPPDATA
+git clone https://github.com/sliperly/nvim-config-windows-python-rust-powershell-ollama.git nvim
+\end{lstlisting}
+\narrow
+
+\begin{paracol}{2}
+\RU
+\textbf{Вариант Б: без GitHub.} Скопируйте папку \key{nvim} со старого компьютера (флешка, архив) в \key{\$env:LOCALAPPDATA}. Проверка:
+\begin{lstlisting}
+Get-ChildItem $env:LOCALAPPDATA/nvim
+\end{lstlisting}
+Должны быть \key{init.lua}, \key{lua} и \key{lazy-lock.json}.
+
+\textbf{Вариант В: вручную.} Создайте файлы по приложению в конце этой инструкции.
+
+Файл \key{lazy-lock.json} закрепляет точные версии плагинов, поэтому на новом компьютере всё ставится ровно таким, как работает сейчас.
+\switchcolumn
+\EN
+\textbf{Option B: without GitHub.} Copy the \key{nvim} folder from the old computer (flash drive, archive) into \key{\$env:LOCALAPPDATA}. Check:
+\begin{lstlisting}
+Get-ChildItem $env:LOCALAPPDATA/nvim
+\end{lstlisting}
+You should see \key{init.lua}, \key{lua} and \key{lazy-lock.json}.
+
+\textbf{Option C: by hand.} Create the files from the appendix at the end of this guide.
+
+The file \key{lazy-lock.json} pins exact plugin versions, so on the new computer everything is installed exactly as it works now.
+\switchcolumn*
+
+\RU
+\section*{Шаг 4. Первый запуск}
+\begin{lstlisting}
+nvim
+\end{lstlisting}
+lazy.nvim скачает сам себя и все плагины. Появится окно со списком: подождите, пока загрузка закончится, и закройте окно клавишей \key{q}. Плагин blink.cmp при первом запуске скачивает готовый бинарный файл (нужен интернет). Если появились красные ошибки, закройте Neovim и запустите заново.
+
+Если конфиг взят из репозитория, в нём уже есть плагины и настройки для Markdown и LaTeX. Они установятся сами. Пока вы не прошли вторую инструкцию, при открытии \key{.md}- или \key{.tex}-файла может появиться сообщение, что сервер texlab или marksman не найден. Это нормально.
+\switchcolumn
+\EN
+\section*{Step 4. First launch}
+\begin{lstlisting}
+nvim
+\end{lstlisting}
+lazy.nvim will download itself and all the plugins. A window with a list appears: wait until loading finishes and close the window with \key{q}. On first launch the blink.cmp plugin downloads a prebuilt binary (internet needed). If red errors appear, close Neovim and start it again.
+
+If the config was taken from the repository, it already contains plugins and settings for Markdown and LaTeX. They install by themselves. Until you complete the second guide, opening a \key{.md} or \key{.tex} file may show a message that the texlab or marksman server was not found. This is normal.
+\switchcolumn*
+
+\RU
+\section*{Шаг 5. Парсеры подсветки}
+В Neovim выполните:
+\begin{lstlisting}
+:TSInstall lua python rust
+\end{lstlisting}
+Дайте каждому языку 20--40 секунд. Проверка: \key{:checkhealth nvim-treesitter}. В списке Installed languages должны быть \key{lua}, \key{python} и \key{rust}.
+\switchcolumn
+\EN
+\section*{Step 5. Highlighting parsers}
+In Neovim run:
+\begin{lstlisting}
+:TSInstall lua python rust
+\end{lstlisting}
+Give each language 20--40 seconds. Check: \key{:checkhealth nvim-treesitter}. The Installed languages list should contain \key{lua}, \key{python} and \key{rust}.
+\switchcolumn*
+
+\RU
+\section*{Шаг 6. Языковые серверы}
+\textbf{Python (Pyright):}
+\begin{lstlisting}
+npm install -g pyright
+pyright --version
+\end{lstlisting}
+\textbf{Rust (rust-analyzer):}
+\begin{lstlisting}
+rustup component add rust-analyzer
+rust-analyzer --version
+\end{lstlisting}
+\textbf{PowerShell (PowerShell Editor Services).} Скачать и распаковать (команды ниже, под текстом). Последняя команда должна вывести \key{True}.
+\switchcolumn
+\EN
+\section*{Step 6. Language servers}
+\textbf{Python (Pyright):}
+\begin{lstlisting}
+npm install -g pyright
+pyright --version
+\end{lstlisting}
+\textbf{Rust (rust-analyzer):}
+\begin{lstlisting}
+rustup component add rust-analyzer
+rust-analyzer --version
+\end{lstlisting}
+\textbf{PowerShell (PowerShell Editor Services).} Download and unpack (commands below the text). The last command should print \key{True}.
+\end{paracol}
+
+\wide
+\begin{lstlisting}
+$dir = Join-Path $env:LOCALAPPDATA 'nvim-data/pses'
+New-Item -ItemType Directory -Force $dir | Out-Null
+$url = 'https://github.com/PowerShell/PowerShellEditorServices/releases/latest/download/PowerShellEditorServices.zip'
+$zip = Join-Path $dir 'pses.zip'
+Invoke-WebRequest $url -OutFile $zip
+Expand-Archive $zip -DestinationPath $dir -Force
+Test-Path (Join-Path $dir 'PowerShellEditorServices/Start-EditorServices.ps1')
+\end{lstlisting}
+\narrow
+
+\begin{paracol}{2}
+\RU
+Важно: в \key{lsp.lua} сервер запускается через \key{powershell} (встроенный Windows PowerShell 5.1), потому что PowerShell 7 из Microsoft Store Neovim запустить не может. Если PowerShell 7 установлен обычным установщиком, можно заменить \key{powershell} на \key{pwsh}.
+\switchcolumn
+\EN
+Important: in \key{lsp.lua} the server is started through \key{powershell} (the built-in Windows PowerShell 5.1), because Neovim cannot launch PowerShell 7 from the Microsoft Store. If PowerShell 7 was installed with the regular installer, you can replace \key{powershell} with \key{pwsh}.
+\switchcolumn*
+
+\RU
+\section*{Шаг 7. Локальная модель}
+Ollama после установки запускается сама (значок ламы в трее). Затем:
+\begin{lstlisting}
+ollama pull qwen2.5-coder:7b
+ollama run qwen2.5-coder:7b 'Hello'
+ollama ps
+\end{lstlisting}
+Модель занимает около 4,7 ГБ. В колонке PROCESSOR команды \key{ollama ps} должно быть \key{100\% GPU}. Плагин настроен на контекст 16384 токена, это около 5,5 ГБ видеопамяти. Если видеопамяти меньше 8 ГБ, уменьшите \key{num\_ctx} в \key{lazy.lua} до 8192.
+\switchcolumn
+\EN
+\section*{Step 7. Local model}
+Ollama starts by itself after installation (a llama icon in the tray). Then:
+\begin{lstlisting}
+ollama pull qwen2.5-coder:7b
+ollama run qwen2.5-coder:7b 'Hello'
+ollama ps
+\end{lstlisting}
+The model takes about 4.7 GB. In the PROCESSOR column of \key{ollama ps} you should see \key{100\% GPU}. The plugin is set to a 16384-token context, which is about 5.5 GB of video memory. If you have less than 8 GB of video memory, reduce \key{num\_ctx} in \key{lazy.lua} to 8192.
+\switchcolumn*
+
+\RU
+\section*{Шаг 8. Punto Switcher (если установлен)}
+Punto Switcher переключает раскладку на лету и ломает ввод команд. Правый клик по значку в трее, затем «Настройки», раздел «Программы-исключения», добавить \key{WindowsTerminal.exe}.
+\switchcolumn
+\EN
+\section*{Step 8. Punto Switcher (if installed)}
+Punto Switcher switches the keyboard layout on the fly and breaks command input. Right-click its tray icon, then ``Settings'', the ``Exception programs'' section, and add \key{WindowsTerminal.exe}.
+\switchcolumn*
+
+\RU
+\section*{Шаг 9. Проверка}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{:checkhealth} не показывает красных ошибок, а \key{:checkhealth vim.provider} показывает Python, Node, Perl и Ruby как Disabled. Это отключены внутренние провайдеры Neovim; к программам, установленным в Windows, это отношения не имеет.
+\item Файл \key{test.py} с одной строкой \key{print(abc)}: справа появляется ошибка \key{abc is not defined}.
+\item Работают \key{Ctrl+p} (поиск файла), \key{Ctrl+f} (поиск текста), \key{Ctrl+n} (дерево).
+\item Набор \key{pri} в Python-файле открывает меню автодополнения.
+\item Пробел, затем \key{a} открывает чат, затем \key{i}, вопрос и \key{Ctrl+s}: приходит ответ модели.
+\end{itemize}
+\switchcolumn
+\EN
+\section*{Step 9. Check}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{:checkhealth} shows no red errors, and \key{:checkhealth vim.provider} shows Python, Node, Perl and Ruby as Disabled. These are Neovim's internal providers being switched off; it has nothing to do with programs installed in Windows.
+\item A file \key{test.py} with the single line \key{print(abc)}: an error \key{abc is not defined} appears on the right.
+\item \key{Ctrl+p} (find file), \key{Ctrl+f} (find text) and \key{Ctrl+n} (tree) work.
+\item Typing \key{pri} in a Python file opens the completion menu.
+\item Space, then \key{a} opens the chat, then \key{i}, a question and \key{Ctrl+s}: the model replies.
+\end{itemize}
+\switchcolumn*
+
+\RU
+\section*{Приложение. Файлы конфигурации}
+Папка: \key{\$env:LOCALAPPDATA/nvim}. Код ниже одинаков для обоих языков.
+\switchcolumn
+\EN
+\section*{Appendix. Configuration files}
+Folder: \key{\$env:LOCALAPPDATA/nvim}. The code below is the same for both languages.
+\end{paracol}
+
+\wide
+\needspace{12\baselineskip}
+\textbf{init.lua}
+\begin{lstlisting}
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+
+require('config.options')
+require('config.lazy')
+require('config.lsp')
+\end{lstlisting}
+
+\needspace{16\baselineskip}
+\textbf{lua/config/options.lua}
+\begin{lstlisting}
+vim.opt.number = true
+vim.opt.mouse = "a"
+vim.opt.scrolloff = 7
+vim.opt.swapfile = false
+vim.opt.termguicolors = true
+vim.keymap.set('i', 'jk', '<Esc>')
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'python', 'lua', 'rust' },
+  callback = function() pcall(vim.treesitter.start) end,
+})
+vim.g.mapleader = ' '
+vim.keymap.set({ 'n', 'v' }, '<leader>a', '<cmd>CodeCompanionChat Toggle<cr>')
+vim.keymap.set({ 'n', 'v' }, '<leader>i', ':CodeCompanion ')
+vim.keymap.set('v', '<leader>c', '<cmd>CodeCompanionChat Add<cr>')
+\end{lstlisting}
+
+\textbf{lua/config/lazy.lua}
+\begin{lstlisting}
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  vim.fn.system({ 'git', 'clone', '--filter=blob:none', '--branch=stable',
+    'https://github.com/folke/lazy.nvim.git', lazypath })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require('lazy').setup({
+  spec = {
+    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+    { 'saghen/blink.cmp', version = '1.*', opts = {} },
+    {
+      'nvim-telescope/telescope.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim' },
+      keys = {
+        { '<C-p>', '<cmd>Telescope find_files<cr>' },
+        { '<C-f>', '<cmd>Telescope live_grep<cr>' },
+      },
+    },
+    {
+      'folke/tokyonight.nvim',
+      lazy = false,
+      priority = 1000,
+      config = function() vim.cmd.colorscheme('tokyonight') end,
+    },
+    {
+      'nvim-tree/nvim-tree.lua',
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
+      keys = { { '<C-n>', '<cmd>NvimTreeToggle<cr>' } },
+      opts = {},
+    },
+    {
+      'olimorris/codecompanion.nvim',
+      dependencies = {
+        'nvim-lua/plenary.nvim',
+        'nvim-treesitter/nvim-treesitter',
+      },
+      cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionActions' },
+      opts = {
+        interactions = {
+          chat = { adapter = { name = 'ollama', model = 'qwen2.5-coder:7b' } },
+          inline = { adapter = { name = 'ollama', model = 'qwen2.5-coder:7b' } },
+        },
+        adapters = {
+          http = {
+            ollama = function()
+              return require('codecompanion.adapters').extend('ollama', {
+                schema = {
+                  num_ctx = { default = 16384 },
+                  keep_alive = { default = '30m' },
+                },
+              })
+            end,
+          },
+        },
+      },
+    },
+  },
+  rocks = { enabled = false },
+})
+\end{lstlisting}
+
+\textbf{lua/config/lsp.lua}
+\begin{lstlisting}
+vim.lsp.config('pyright', {
+  cmd = { 'pyright-langserver', '--stdio' },
+  filetypes = { 'python' },
+  root_markers = { 'pyrightconfig.json', 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' },
+})
+vim.lsp.enable('pyright')
+
+vim.diagnostic.config({ virtual_text = true })
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
+  end,
+})
+
+local pses = vim.fs.normalize(vim.fn.stdpath('data') .. '/pses')
+local cache = vim.fs.normalize(vim.fn.stdpath('cache'))
+local pses_cmd = string.format(
+  "& '%s/PowerShellEditorServices/Start-EditorServices.ps1' "
+    .. "-BundledModulesPath '%s' "
+    .. "-LogPath '%s/powershell_es.log' "
+    .. "-SessionDetailsPath '%s/powershell_es.session.json' "
+    .. "-FeatureFlags @() -AdditionalModules @() "
+    .. "-HostName nvim -HostProfileId 0 -HostVersion 1.0.0 "
+    .. "-Stdio -LogLevel Normal",
+  pses, pses, cache, cache
+)
+
+vim.lsp.config('powershell_es', {
+  cmd = { 'powershell', '-NoLogo', '-ExecutionPolicy', 'Bypass', '-NoProfile', '-Command', pses_cmd },
+  filetypes = { 'ps1' },
+  root_markers = { 'PSScriptAnalyzerSettings.psd1', '.git' },
+})
+vim.lsp.enable('powershell_es')
+
+vim.lsp.config('rust_analyzer', {
+  cmd = { 'rust-analyzer' },
+  filetypes = { 'rust' },
+  root_markers = { 'Cargo.toml', 'rust-project.json', '.git' },
+})
+vim.lsp.enable('rust_analyzer')
+\end{lstlisting}
+\narrow
+
+\begin{paracol}{2}
+\RU
+В репозитории строка запуска PowerShell в \key{lsp.lua} записана одной длинной строкой. Здесь она разбита на части, чтобы при копировании из PDF не появились лишние переводы строк. Работает она так же.
+\switchcolumn
+\EN
+In the repository the PowerShell launch string in \key{lsp.lua} is written as one long line. Here it is split into parts so that copying from the PDF does not introduce stray line breaks. It works the same way.
+\switchcolumn*
+
+\RU
+\section*{Резервная копия конфига}
+Сохранить версию:
+\begin{lstlisting}
+cd $env:LOCALAPPDATA/nvim
+git add .
+git commit -m 'Update config'
+\end{lstlisting}
+Если папка ещё не репозиторий Git (вариант В), сначала выполните \key{git init -b master}.
+
+Git подписывает коммиты вашим именем и почтой. Если он их не знает, задайте:
+\begin{lstlisting}
+git config --global user.name 'YOUR_NAME'
+git config --global user.email 'YOUR_EMAIL'
+\end{lstlisting}
+\textbf{Важно:} в публичном репозитории почта из коммитов видна всем. На GitHub откройте Settings, затем Emails и включите «Keep my email addresses private». Там же будет скрытый адрес вида \key{12345678+имя@users.noreply.github.com}: подставьте его вместо \key{YOUR\_EMAIL}. Сделайте это до первого коммита, иначе старые коммиты придётся переписывать.
+\switchcolumn
+\EN
+\section*{Config backup}
+Save a version:
+\begin{lstlisting}
+cd $env:LOCALAPPDATA/nvim
+git add .
+git commit -m 'Update config'
+\end{lstlisting}
+If the folder is not yet a Git repository (option C), first run \key{git init -b master}.
+
+Git signs commits with your name and email. If it does not know them, set them:
+\begin{lstlisting}
+git config --global user.name 'YOUR_NAME'
+git config --global user.email 'YOUR_EMAIL'
+\end{lstlisting}
+\textbf{Important:} in a public repository the email from commits is visible to everyone. On GitHub open Settings, then Emails, and turn on ``Keep my email addresses private''. The same page shows a hidden address like \key{12345678+name@users.noreply.github.com}: use it instead of \key{YOUR\_EMAIL}. Do this before the first commit, otherwise old commits have to be rewritten.
+\switchcolumn*
+
+\RU
+Выложить на GitHub (по желанию): создайте на github.com пустой репозиторий (закрытый или публичный). Замените в команде \key{YOUR\_REPO\_URL} на его адрес.
+
+Если конфиг был взят из чужого репозитория (вариант А), адрес origin сейчас ведёт на репозиторий автора. Перенаправьте его на свой:
+\begin{lstlisting}
+git remote set-url origin YOUR_REPO_URL
+git push -u origin master
+\end{lstlisting}
+Если origin ещё не задан (варианты Б и В), вместо первой строки выполните \key{git remote add origin YOUR\_REPO\_URL}.
+
+В копию попадают только ваши файлы и \key{lazy-lock.json}. Сами плагины в неё не входят: lazy скачает их при первом запуске. Не кладите в репозиторий пароли и ключи доступа (сейчас их в конфиге нет).
+\switchcolumn
+\EN
+Publish to GitHub (optional): create an empty repository on github.com (private or public). Replace \key{YOUR\_REPO\_URL} in the command with its address.
+
+If the config came from someone else's repository (option A), the origin address now points to the author's repository. Redirect it to your own:
+\begin{lstlisting}
+git remote set-url origin YOUR_REPO_URL
+git push -u origin master
+\end{lstlisting}
+If origin is not set yet (options B and C), run \key{git remote add origin YOUR\_REPO\_URL} instead of the first line.
+
+Only your files and \key{lazy-lock.json} go into the copy. The plugins themselves are not included: lazy downloads them on first launch. Do not put passwords or access keys into the repository (there are none in the config now).
+\switchcolumn*
+
+\RU
+\section*{Что дальше}
+Если нужны Markdown и LaTeX, продолжайте по инструкции \key{install-markdown-latex}. Шпаргалка по клавишам: \key{cheatsheet-neovim}.
+\switchcolumn
+\EN
+\section*{What next}
+If you need Markdown and LaTeX, continue with the guide \key{install-markdown-latex}. Key reference: \key{cheatsheet-neovim}.
+\end{paracol}
+
+\end{document}

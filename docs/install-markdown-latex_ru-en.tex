@@ -1,0 +1,453 @@
+% Build: XeLaTeX (latexmk -xelatex). Fonts: Times New Roman, Courier New (Windows).
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=14mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Courier New}[Scale=0.88]
+\usepackage[russian,english]{babel}
+\usepackage{paracol}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  rulecolor=\color{black!35},
+  backgroundcolor=\color{black!4},
+  columns=fixed,
+  keepspaces=true,
+  showstringspaces=false,
+  aboveskip=4pt,
+  belowskip=4pt
+}
+\setlength{\columnsep}{7mm}
+\columnseprule=0.4pt
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{8pt}{2pt}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{5pt}{1pt}
+
+\newcommand{\RU}{\selectlanguage{russian}}
+\newcommand{\EN}{\selectlanguage{english}}
+% inline code (never use inside another command's argument)
+\newcommand{\key}[1]{\texttt{#1}}
+
+\begin{document}
+\sloppy
+
+\begin{paracol}{2}
+\RU
+{\Large\bfseries Дополнительная установка Markdown и LaTeX\par}
+Инструкция для готовой конфигурации Neovim из этого репозитория (Windows 11).
+\switchcolumn
+\EN
+{\Large\bfseries Additional setup: Markdown and LaTeX\par}
+A guide for the ready-made Neovim configuration from this repository (Windows 11).
+\switchcolumn*
+
+\RU
+\section*{Назначение}
+Инструкция добавляет и проверяет: Markdown; LaTeX; LSP для обоих; красивое отображение Markdown; сборку LaTeX в PDF.
+Основная установка описана в файле \key{install-neovim}.
+\switchcolumn
+\EN
+\section*{Purpose}
+This guide adds and checks: Markdown; LaTeX; LSP for both; nice Markdown rendering; LaTeX-to-PDF builds.
+The base installation is described in \key{install-neovim}.
+\switchcolumn*
+
+\RU
+\section*{1. Что нужно заранее}
+Windows 11; Neovim 0.12 или новее; Git; конфигурация из этого репозитория, которая запускается без ошибок. PowerShell 7 желателен.
+Проверка версии Neovim (в PowerShell):
+\begin{lstlisting}
+nvim --version
+\end{lstlisting}
+\switchcolumn
+\EN
+\section*{1. Prerequisites}
+Windows 11; Neovim 0.12 or newer; Git; the configuration from this repository starting without errors. PowerShell 7 is recommended.
+Check the Neovim version (in PowerShell):
+\begin{lstlisting}
+nvim --version
+\end{lstlisting}
+\switchcolumn*
+
+\RU
+\section*{2. Установка MiKTeX}
+MiKTeX — дистрибутив LaTeX для Windows. Скачайте его с официального сайта \key{https://miktex.org/download}, установите и перезапустите PowerShell.
+Проверка:
+\begin{lstlisting}
+xelatex --version
+latexmk --version
+\end{lstlisting}
+Обе команды должны выполниться без сообщения «команда не найдена». Если нужно узнать, откуда запускаются программы:
+\begin{lstlisting}
+Get-Command xelatex
+Get-Command latexmk
+\end{lstlisting}
+\switchcolumn
+\EN
+\section*{2. Install MiKTeX}
+MiKTeX is a LaTeX distribution for Windows. Download it from the official site \key{https://miktex.org/download}, install it and restart PowerShell.
+Check:
+\begin{lstlisting}
+xelatex --version
+latexmk --version
+\end{lstlisting}
+Both commands must run without a ``command not found'' message. To see where the programs are launched from:
+\begin{lstlisting}
+Get-Command xelatex
+Get-Command latexmk
+\end{lstlisting}
+\switchcolumn*
+
+\RU
+\section*{3. Установка Perl (обязательно)}
+Программа \key{latexmk} написана на Perl, а MiKTeX Perl не содержит. Без него сборка падает с сообщением «MiKTeX could not find the script engine perl».
+Установите Strawberry Perl с сайта \key{https://strawberryperl.com}, затем перезапустите PowerShell и проверьте:
+\begin{lstlisting}
+perl -v
+\end{lstlisting}
+Должна показаться версия Perl. После этого перезапустите и Neovim.
+\switchcolumn
+\EN
+\section*{3. Install Perl (required)}
+\key{latexmk} is written in Perl, and MiKTeX does not include Perl. Without it the build fails with ``MiKTeX could not find the script engine perl''.
+Install Strawberry Perl from \key{https://strawberryperl.com}, restart PowerShell and check:
+\begin{lstlisting}
+perl -v
+\end{lstlisting}
+The Perl version should be printed. Then restart Neovim as well.
+\switchcolumn*
+
+\RU
+\section*{4. Проверка XeLaTeX и русского текста}
+Создайте временный файл \key{test.tex}:
+\begin{Verbatim}[frame=single,rulecolor=\color{black!35},fontsize=\small]
+\documentclass{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[russian]{babel}
+\begin{document}
+\section{Тест}
+Это обычный русский текст.
+\[
+E = mc^2
+\]
+\end{document}
+\end{Verbatim}
+Перейдите в папку с файлом и выполните:
+\begin{lstlisting}
+xelatex test.tex
+\end{lstlisting}
+Рядом должен появиться \key{test.pdf}. Откройте его: русский текст и формула должны отображаться правильно.
+Можно использовать любой другой установленный шрифт с кириллицей.
+\switchcolumn
+\EN
+\section*{4. Check XeLaTeX and Russian text}
+Create a temporary file \key{test.tex}:
+\begin{Verbatim}[frame=single,rulecolor=\color{black!35},fontsize=\small]
+\documentclass{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[russian]{babel}
+\begin{document}
+\section{Тест}
+Это обычный русский текст.
+\[
+E = mc^2
+\]
+\end{document}
+\end{Verbatim}
+Go to the folder with the file and run:
+\begin{lstlisting}
+xelatex test.tex
+\end{lstlisting}
+\key{test.pdf} should appear next to it. Open it: the Russian text and the formula must display correctly.
+Any other installed font with Cyrillic support will do.
+\switchcolumn*
+
+\RU
+\section*{5. Плагины в lazy.lua}
+Если конфиг взят из репозитория (варианты А и Б основной инструкции), нужные плагины уже есть в \key{lua/config/lazy.lua}: Mason (менеджер серверов), render-markdown и VimTeX. Если вы создавали файлы вручную (вариант В), добавьте эти три блока в список \key{spec} в \key{lazy.lua}. VimTeX настроен на XeLaTeX:
+\begin{lstlisting}
+{
+  "lervag/vimtex",
+  ft = "tex",
+  init = function()
+    vim.g.vimtex_compiler_latexmk_engines = {
+      _ = "-xelatex",
+    }
+  end,
+},
+\end{lstlisting}
+Блок для Mason (менеджера серверов):
+\begin{lstlisting}
+{
+  "mason-org/mason.nvim",
+  opts = {},
+},
+\end{lstlisting}
+Блок для render-markdown приведён в разделе 9.
+
+После изменения конфигурации перезапустите Neovim. В открытом \key{.tex}-файле выполните:
+\begin{lstlisting}
+:VimtexInfo
+\end{lstlisting}
+В информации должен быть виден компилятор \key{latexmk}.
+\switchcolumn
+\EN
+\section*{5. Plugins in lazy.lua}
+If the config was taken from the repository (options A and B of the base guide), the required plugins are already in \key{lua/config/lazy.lua}: Mason (server manager), render-markdown and VimTeX. If you created the files by hand (option C), add these three blocks to the \key{spec} list in \key{lazy.lua}. VimTeX is set to XeLaTeX:
+\begin{lstlisting}
+{
+  "lervag/vimtex",
+  ft = "tex",
+  init = function()
+    vim.g.vimtex_compiler_latexmk_engines = {
+      _ = "-xelatex",
+    }
+  end,
+},
+\end{lstlisting}
+The block for Mason (the server manager):
+\begin{lstlisting}
+{
+  "mason-org/mason.nvim",
+  opts = {},
+},
+\end{lstlisting}
+The block for render-markdown is in section 9.
+
+After changing the configuration, restart Neovim. In an open \key{.tex} file run:
+\begin{lstlisting}
+:VimtexInfo
+\end{lstlisting}
+The compiler \key{latexmk} should be listed.
+\switchcolumn*
+
+\RU
+\section*{6. Сборка LaTeX через VimTeX}
+Откройте \key{.tex}-файл в Neovim. Знак \key{\textbackslash} — это клавиша Backslash.
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{\textbackslash ll} — запустить сборку;
+\item \key{\textbackslash lv} — открыть PDF;
+\item \key{\textbackslash le} — показать ошибки;
+\item \key{\textbackslash lk} — остановить сборку;
+\item \key{\textbackslash li} — информация VimTeX.
+\end{itemize}
+Например, для сборки: \key{Esc}, затем \key{\textbackslash}, \key{l}, \key{l}.
+Если Windows не даёт пересобрать файл, закройте PDF в просмотрщике.
+\switchcolumn
+\EN
+\section*{6. Building LaTeX with VimTeX}
+Open a \key{.tex} file in Neovim. The sign \key{\textbackslash} is the Backslash key.
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{\textbackslash ll} — start the build;
+\item \key{\textbackslash lv} — open the PDF;
+\item \key{\textbackslash le} — show errors;
+\item \key{\textbackslash lk} — stop the build;
+\item \key{\textbackslash li} — VimTeX info.
+\end{itemize}
+For example, to build: \key{Esc}, then \key{\textbackslash}, \key{l}, \key{l}.
+If Windows refuses to rebuild the file, close the PDF in the viewer.
+\switchcolumn*
+
+\RU
+\section*{7. Серверы texlab и marksman (Mason)}
+LSP-серверы ставятся через Mason \emph{внутри Neovim}. Они хранятся не в репозитории, а в папке данных Neovim, поэтому на новом компьютере их нужно поставить заново:
+\begin{lstlisting}
+:MasonInstall texlab marksman
+\end{lstlisting}
+Сам Mason можно открыть командой \key{:Mason}. Подождите, пока установка закончится, и перезапустите Neovim.
+\switchcolumn
+\EN
+\section*{7. Servers texlab and marksman (Mason)}
+LSP servers are installed through Mason \emph{inside Neovim}. They are not stored in the repository but in Neovim's data folder, so on a new computer they must be installed again:
+\begin{lstlisting}
+:MasonInstall texlab marksman
+\end{lstlisting}
+Mason itself opens with \key{:Mason}. Wait until the installation finishes and restart Neovim.
+\switchcolumn*
+
+\RU
+\section*{8. Настройка серверов в lsp.lua}
+В \key{lua/config/lsp.lua} (из репозитория) уже есть следующее; при ручной установке (вариант В) добавьте это в конец файла:
+\begin{lstlisting}
+vim.lsp.config('texlab', {
+  cmd = { 'texlab' },
+  filetypes = { 'tex' },
+  root_markers = { '.latexmkrc', '.git' },
+})
+vim.lsp.enable('texlab')
+
+vim.lsp.config('marksman', {
+  cmd = { 'marksman', 'server' },
+  filetypes = { 'markdown' },
+  root_markers = { '.git' },
+})
+vim.lsp.enable('marksman')
+\end{lstlisting}
+Откройте \key{.tex}- или \key{.md}-файл и выведите подключённые серверы:
+\begin{lstlisting}
+:lua for _, c in ipairs(vim.lsp.get_clients({bufnr=0})) do print(c.name) end
+\end{lstlisting}
+Для \key{.tex} должен быть \key{texlab}, для \key{.md} — \key{marksman}.
+\switchcolumn
+\EN
+\section*{8. Server settings in lsp.lua}
+\key{lua/config/lsp.lua} (from the repository) already contains the following; with a manual install (option C) add it to the end of the file:
+\begin{lstlisting}
+vim.lsp.config('texlab', {
+  cmd = { 'texlab' },
+  filetypes = { 'tex' },
+  root_markers = { '.latexmkrc', '.git' },
+})
+vim.lsp.enable('texlab')
+
+vim.lsp.config('marksman', {
+  cmd = { 'marksman', 'server' },
+  filetypes = { 'markdown' },
+  root_markers = { '.git' },
+})
+vim.lsp.enable('marksman')
+\end{lstlisting}
+Open a \key{.tex} or \key{.md} file and list the attached servers:
+\begin{lstlisting}
+:lua for _, c in ipairs(vim.lsp.get_clients({bufnr=0})) do print(c.name) end
+\end{lstlisting}
+A \key{.tex} file should show \key{texlab}, a \key{.md} file \key{marksman}.
+\switchcolumn*
+
+\RU
+\section*{9. Отображение Markdown}
+За красивое отображение отвечает плагин render-markdown.nvim. Он включается сам для файлов Markdown:
+\begin{lstlisting}
+{
+  "MeanderingProgrammer/render-markdown.nvim",
+  ft = "markdown",
+  opts = {},
+},
+\end{lstlisting}
+Откройте любой \key{.md}-файл: заголовки, списки и выделение должны отображаться оформленными прямо в Neovim. Тип файла:
+\begin{lstlisting}
+:set filetype?
+\end{lstlisting}
+Ожидается \key{filetype=markdown}.
+\switchcolumn
+\EN
+\section*{9. Markdown rendering}
+Nice rendering is done by the render-markdown.nvim plugin. It turns on by itself for Markdown files:
+\begin{lstlisting}
+{
+  "MeanderingProgrammer/render-markdown.nvim",
+  ft = "markdown",
+  opts = {},
+},
+\end{lstlisting}
+Open any \key{.md} file: headings, lists and emphasis should appear formatted right inside Neovim. File type:
+\begin{lstlisting}
+:set filetype?
+\end{lstlisting}
+Expected: \key{filetype=markdown}.
+\switchcolumn*
+
+\RU
+\section*{10. Итоговая проверка}
+\textbf{Markdown.} Создайте временный файл \key{test.md}:
+\begin{Verbatim}[frame=single,rulecolor=\color{black!35},fontsize=\small]
+# Тест
+
+Обычный текст, **жирный** и *курсив*.
+
+- первый пункт
+- второй пункт
+
+[Сайт Neovim](https://neovim.io)
+\end{Verbatim}
+Откройте его в Neovim. Должны выполняться три условия: заголовок и список показаны оформленными, \key{:set filetype?} выдаёт \key{filetype=markdown}, а в списке серверов есть \key{marksman}.
+
+\textbf{LaTeX.} Откройте \key{test.tex} из раздела 4, выполните \key{:VimtexInfo}, затем \key{\textbackslash ll} и \key{\textbackslash lv}. PDF должен собраться и открыться, а в списке серверов должен быть \key{texlab}.
+\switchcolumn
+\EN
+\section*{10. Final check}
+\textbf{Markdown.} Create a temporary file \key{test.md}:
+\begin{Verbatim}[frame=single,rulecolor=\color{black!35},fontsize=\small]
+# Test
+
+Plain text, **bold** and *italic*.
+
+- first item
+- second item
+
+[Neovim site](https://neovim.io)
+\end{Verbatim}
+Open it in Neovim. Three conditions must hold: the heading and the list are shown formatted, \key{:set filetype?} prints \key{filetype=markdown}, and \key{marksman} is in the server list.
+
+\textbf{LaTeX.} Open \key{test.tex} from section 4, run \key{:VimtexInfo}, then \key{\textbackslash ll} and \key{\textbackslash lv}. The PDF must build and open, and \key{texlab} must be in the server list.
+\switchcolumn*
+
+\RU
+\section*{11. Что в итоге установлено}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Markdown LSP — Marksman;
+\item отображение Markdown — render-markdown.nvim;
+\item LaTeX LSP — texlab;
+\item интеграция LaTeX — VimTeX;
+\item сборка — latexmk (нужен Perl) и XeLaTeX;
+\item дистрибутив — MiKTeX.
+\end{itemize}
+\switchcolumn
+\EN
+\section*{11. What ends up installed}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Markdown LSP — Marksman;
+\item Markdown rendering — render-markdown.nvim;
+\item LaTeX LSP — texlab;
+\item LaTeX integration — VimTeX;
+\item build — latexmk (needs Perl) and XeLaTeX;
+\item distribution — MiKTeX.
+\end{itemize}
+\switchcolumn*
+
+\RU
+\section*{12. Типичные проблемы}
+\subsection*{Сборка падает: «could not find the script engine perl»}
+Не установлен Perl. См. раздел 3.
+\subsection*{xelatex или latexmk не найден}
+Проверьте \key{Get-Command xelatex}. Если не найден, убедитесь, что папка MiKTeX есть в \key{PATH}, и перезапустите PowerShell и Neovim.
+\subsection*{Русский текст не собирается}
+Используйте XeLaTeX и пакеты \key{fontspec} и \key{babel} с \key{russian}, а также шрифт с кириллицей.
+\subsection*{texlab или marksman не подключается}
+Выполните \key{:MasonInstall texlab marksman}, перезапустите Neovim и повторите проверку из раздела 8.
+\subsection*{Сообщение MiKTeX «you have not checked for MiKTeX updates»}
+Это не ошибка сборки, если PDF создан. Обновления можно проверить в MiKTeX Console.
+\subsection*{Команда из PDF не работает в PowerShell}
+Копируйте команды из блоков кода. Если вставился странный символ вместо дефиса, сообщите об этом в Issues репозитория.
+\switchcolumn
+\EN
+\section*{12. Common problems}
+\subsection*{Build fails: ``could not find the script engine perl''}
+Perl is not installed. See section 3.
+\subsection*{xelatex or latexmk not found}
+Run \key{Get-Command xelatex}. If it is not found, make sure the MiKTeX folder is in \key{PATH} and restart PowerShell and Neovim.
+\subsection*{Russian text does not build}
+Use XeLaTeX with the \key{fontspec} and \key{babel} packages (\key{russian}), and a font with Cyrillic.
+\subsection*{texlab or marksman does not attach}
+Run \key{:MasonInstall texlab marksman}, restart Neovim and repeat the check from section 8.
+\subsection*{MiKTeX message ``you have not checked for MiKTeX updates''}
+This is not a build error if the PDF was created. You can check for updates in MiKTeX Console.
+\subsection*{A command from the PDF does not work in PowerShell}
+Copy commands from the code blocks. If a strange character appears instead of a hyphen, please report it in the repository Issues.
+\end{paracol}
+
+\end{document}

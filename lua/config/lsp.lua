@@ -36,3 +36,18 @@ vim.lsp.config('rust_analyzer', {
 })
 
 vim.lsp.enable('rust_analyzer')
+vim.lsp.config('texlab', {
+  cmd = { 'texlab' },
+  filetypes = { 'tex' },
+  root_markers = { '.latexmkrc', '.git' },
+})
+
+vim.lsp.enable('texlab')
+
+vim.lsp.config('marksman', {
+  cmd = { 'marksman', 'server' },
+  filetypes = { 'markdown' },
+  root_markers = { '.git' },
+})
+
+vim.lsp.enable('marksman')

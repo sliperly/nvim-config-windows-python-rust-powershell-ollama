@@ -79,6 +79,24 @@ require("lazy").setup({
 			priority = 1000,
 			config = function() vim.cmd.colorscheme("tokyonight") end,
 		},
+		{
+			"MeanderingProgrammer/render-markdown.nvim",
+			ft = "markdown",
+			opts = {},
+		},
+		{
+			"lervag/vimtex",
+			ft = "tex",
+			init = function()
+				vim.g.vimtex_compiler_latexmk_engines = {
+					_ = "-xelatex",
+				}
+			end,
+		},
+		{
+			"mason-org/mason.nvim",
+			opts = {},
+		},
 	},
 	rocks = { enabled = false },
 })

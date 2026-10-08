@@ -1,0 +1,316 @@
+% Build: XeLaTeX (latexmk -xelatex). Fonts: Times New Roman, Courier New (Windows).
+% Layout: prose in two columns (paracol); key tables full width: key | RU | EN.
+% Key cells use Latin placeholders (word, old, new, file) so one cell serves both languages.
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=14mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Courier New}[Scale=0.88]
+\usepackage[russian,english]{babel}
+\usepackage{paracol}
+\usepackage{array,longtable,booktabs}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\columnsep}{7mm}
+\columnseprule=0.4pt
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{8pt}{3pt}
+
+\newcommand{\RU}{\selectlanguage{russian}}
+\newcommand{\EN}{\selectlanguage{english}}
+\newcommand{\key}[1]{\texttt{\bfseries #1}}
+\newcommand{\bs}{\textbackslash}
+
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\LTpre}{2pt}\setlength{\LTpost}{4pt}
+% Column types: key column (K narrow, L medium, W wide), RU and EN description columns
+\newcolumntype{K}{>{\ttfamily\small\bfseries}p{52mm}}
+\newcolumntype{L}{>{\ttfamily\small\bfseries}p{72mm}}
+\newcolumntype{W}{>{\ttfamily\small\bfseries}p{84mm}}
+\newcolumntype{A}{>{\small\leavevmode\RU}p{59mm}}
+\newcolumntype{B}{>{\small\leavevmode\EN}p{59mm}}
+\newcolumntype{C}{>{\small\leavevmode\RU}p{50mm}}
+\newcolumntype{D}{>{\small\leavevmode\EN}p{50mm}}
+\newcolumntype{E}{>{\small\leavevmode\RU}p{43mm}}
+\newcolumntype{F}{>{\small\leavevmode\EN}p{43mm}}
+\newcommand{\hdr}[3]{\toprule \textbf{#1} & \textbf{#2} & \textbf{#3} \\ \midrule \endhead}
+
+\begin{document}
+\sloppy
+
+\begin{paracol}{2}
+\RU
+\begingroup\hyphenpenalty=10000 \exhyphenpenalty=10000
+{\Large\bfseries Шпаргалка Neovim: клавиши и команды\par}
+Конфигурация для Windows 11: Python, Rust, PowerShell, Markdown, LaTeX, локальный ИИ-помощник · октябрь 2026\par\endgroup
+\switchcolumn
+\EN
+\begingroup\hyphenpenalty=10000 \exhyphenpenalty=10000
+{\Large\bfseries Neovim cheat sheet: keys and commands\par}
+Configuration for Windows 11: Python, Rust, PowerShell, Markdown, LaTeX, a local AI assistant · October 2026\par\endgroup
+\switchcolumn*
+
+\RU
+\section*{Как читать}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{Esc} включает обычный режим (команды), \key{i} включает режим вставки (печать). Если не сказано иное, клавиши ниже нажимаются в обычном режиме.
+\item \key{Space a} означает: нажать пробел, отпустить, нажать \key{a}.
+\item Всё, что начинается с двоеточия, это команда: набрать её и нажать Enter.
+\item Слова вроде \key{word}, \key{old}, \key{new}, \key{file} в командах это подстановки: замените их своими.
+\item Пути в PowerShell можно писать с прямыми слэшами: \key{\$env:LOCALAPPDATA/nvim} работает так же, как с обратными.
+\end{itemize}
+\switchcolumn
+\EN
+\section*{How to read}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \key{Esc} switches to normal mode (commands), \key{i} switches to insert mode (typing). Unless stated otherwise, the keys below are pressed in normal mode.
+\item \key{Space a} means: press the space bar, release it, press \key{a}.
+\item Anything that starts with a colon is a command: type it and press Enter.
+\item Words such as \key{word}, \key{old}, \key{new}, \key{file} in commands are placeholders: replace them with your own.
+\item In PowerShell you can write paths with forward slashes: \key{\$env:LOCALAPPDATA/nvim} works the same as with backslashes.
+\end{itemize}
+\end{paracol}
+
+\section*{Режимы / Modes}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+i & Режим вставки перед курсором & Insert mode before the cursor \\
+o / O & Новая строка ниже / выше и режим вставки & New line below / above and insert mode \\
+Esc & Выход в обычный режим & Back to normal mode \\
+jk & В режиме вставки, нажатые быстро: то же, что Esc & In insert mode, pressed quickly: same as Esc \\
+V & Выделить строки целиком (затем j / k растягивают выделение) & Select whole lines (then j / k extend the selection) \\
+v & Выделить по символам & Select by characters \\
+\end{longtable}
+
+\section*{Сохранение и выход / Saving and quitting}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Command / Команда}{Что делает}{What it does}
+:w & Сохранить & Save \\
+:wq & Сохранить и выйти & Save and quit \\
+:q & Выйти (не сработает, если есть несохранённые изменения) & Quit (will not work if there are unsaved changes) \\
+:q! & Выйти без сохранения & Quit without saving \\
+:qa & Закрыть все окна & Close all windows \\
+:qa! & Закрыть все окна без сохранения (выручает, когда открыты чат или дерево) & Close all windows without saving (helps when the chat or the tree is open) \\
+:e! & Выбросить несохранённые изменения и вернуть файл как при последнем сохранении & Discard unsaved changes and restore the file as of the last save \\
+\end{longtable}
+
+\section*{Перемещение / Moving around}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+j / k & Вниз / вверх & Down / up \\
+0 & В начало строки & To the start of the line \\
+gg & В начало файла & To the start of the file \\
+G & В конец файла & To the end of the file \\
+:30 or 30G & На строку 30 & To line 30 \\
+Ctrl+Home & В начало файла & To the start of the file \\
+Ctrl+w, w & Переключиться между окнами (файл, дерево, чат) & Switch between windows (file, tree, chat) \\
+\end{longtable}
+
+\section*{Поиск и правка текста / Searching and editing text}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+/word, Enter & Найти слово в файле & Find a word in the file \\
+:44d & Удалить строку 44 & Delete line 44 \\
+:25,\$d & Удалить строки с 25 до конца файла & Delete lines from 25 to the end of the file \\
+:\%s/old/new/ & Заменить текст в файле (первое совпадение в каждой строке) & Replace text in the file (first match on each line) \\
+cw & Заменить слово под курсором: удаляет слово и включает вставку & Replace the word under the cursor: deletes the word and starts insert mode \\
+0, D & Очистить строку целиком (D удаляет от курсора до конца строки) & Clear the whole line (D deletes from the cursor to the end of the line) \\
+gg=G & Выровнять отступы во всём файле & Re-indent the whole file \\
+u & Отменить последнее действие (нажимать можно несколько раз) & Undo the last action (can be pressed several times) \\
+Ctrl+r & Вернуть отменённое & Redo what was undone \\
+\end{longtable}
+
+\section*{Файлы и поиск / Files and search}
+\begin{longtable}{@{}L C D@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+:e \$MYVIMRC & Открыть init.lua & Open init.lua \\
+:e \$LOCALAPPDATA/nvim/lua/config/lazy.lua & Открыть файл по пути & Open a file by path \\
+Ctrl+p & Поиск файла по имени (вместо стандартной клавиши) & Find a file by name (replaces the default key) \\
+Ctrl+f & Поиск текста по всем файлам проекта (вместо прокрутки страницы) & Search text across all project files (replaces page scrolling) \\
+Ctrl+n & Открыть и закрыть файловое дерево слева & Open and close the file tree on the left \\
+Arrows, Enter, Esc & В окнах поиска и в дереве: выбрать, открыть, закрыть & In the search windows and the tree: choose, open, close \\
+\end{longtable}
+
+\begin{paracol}{2}
+\RU
+Файлы конфигурации лежат в \key{\$LOCALAPPDATA/nvim/}: \key{init.lua}, \key{lua/config/options.lua}, \key{lua/config/lazy.lua} (плагины), \key{lua/config/lsp.lua} (языковые серверы), \key{lazy-lock.json} (версии плагинов).
+\switchcolumn
+\EN
+The configuration files live in \key{\$LOCALAPPDATA/nvim/}: \key{init.lua}, \key{lua/config/options.lua}, \key{lua/config/lazy.lua} (plugins), \key{lua/config/lsp.lua} (language servers), \key{lazy-lock.json} (plugin versions).
+\end{paracol}
+
+\section*{Код: подсказки и автодополнение / Code: hints and completion}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+gd & Перейти к определению функции или переменной (Python, Rust, PowerShell) & Go to the definition of a function or variable (Python, Rust, PowerShell) \\
+Ctrl+y & Принять выбранный вариант & Accept the selected item \\
+Ctrl+n / Ctrl+p / arrows & Выбрать вариант в меню & Choose an item in the menu \\
+Ctrl+e & Закрыть меню & Close the menu \\
+Ctrl+Space & Вызвать меню вручную & Open the menu manually \\
+\end{longtable}
+
+\begin{paracol}{2}
+\RU
+Ошибки и предупреждения от языкового сервера показываются текстом справа от строки. Запись \key{E:2 W:1} в строке статуса показывает количество ошибок и предупреждений в файле. Меню автодополнения появляется само при наборе.
+
+Примечание: в стандартной раскладке плагина blink.cmp клавиша Enter вариант не принимает, для этого нужен \key{Ctrl+y}.
+
+Сервер запускается через 10--30 секунд после открытия файла. Если подсказок нет, выполните \key{:checkhealth vim.lsp}.
+\switchcolumn
+\EN
+Errors and warnings from the language server are shown as text to the right of the line. The entry \key{E:2 W:1} in the status line shows the number of errors and warnings in the file. The completion menu appears by itself while you type.
+
+Note: in the default blink.cmp key layout the Enter key does not accept an item; use \key{Ctrl+y} for that.
+
+The server starts 10--30 seconds after you open a file. If there are no hints, run \key{:checkhealth vim.lsp}.
+\end{paracol}
+
+\section*{Markdown}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Command / Команда}{Что делает}{What it does}
+:RenderMarkdown toggle & Включить или выключить оформленный вид Markdown & Turn the rendered Markdown view on or off \\
+:set ft? & Какой тип файла определил Neovim (для Markdown должно быть filetype=markdown) & Which file type Neovim detected (for Markdown it should be filetype=markdown) \\
+\end{longtable}
+
+\begin{paracol}{2}
+\RU
+Оформление показывается в обычном режиме, а в режиме вставки виден исходный текст разметки. Языковой сервер для Markdown называется marksman; подключён ли он, показывает \key{:checkhealth vim.lsp}.
+\switchcolumn
+\EN
+The rendered view is shown in normal mode, while insert mode shows the raw markup. The language server for Markdown is called marksman; whether it is attached is shown by \key{:checkhealth vim.lsp}.
+\end{paracol}
+
+\section*{LaTeX (VimTeX)}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+\bs ll & Запустить непрерывную сборку PDF & Start continuous PDF build \\
+\bs lv & Открыть PDF & Open the PDF \\
+\bs le & Показать ошибки сборки & Show build errors \\
+\bs lk & Остановить сборку & Stop the build \\
+\bs li & Информация VimTeX (проект, компилятор) & VimTeX info (project, compiler) \\
+\bs lc & Удалить служебные файлы сборки (.aux, .log и др.) & Remove build auxiliary files (.aux, .log, etc.) \\
+:VimtexInfo & То же, что \key{\bs li}, командой & Same as \key{\bs li}, as a command \\
+:Mason & Окно менеджера языковых серверов & Language server manager window \\
+:MasonInstall texlab marksman & Установить серверы для LaTeX и Markdown & Install the LaTeX and Markdown servers \\
+\end{longtable}
+
+\begin{paracol}{2}
+\RU
+Знак \key{\bs} это клавиша Backslash. Для сборки нужны MiKTeX и Perl; подробности в инструкции \key{install-markdown-latex}.
+\switchcolumn
+\EN
+The sign \key{\bs} is the Backslash key. Building requires MiKTeX and Perl; see the guide \key{install-markdown-latex} for details.
+\switchcolumn*
+
+\RU
+\section*{ИИ-помощник (локальная модель)}
+Перед работой Ollama должна быть запущена (значок ламы в трее). Модель: \key{qwen2.5-coder:7b}, контекст 16384 токена.
+\switchcolumn
+\EN
+\section*{AI assistant (local model)}
+Ollama must be running before you start (the llama icon in the tray). Model: \key{qwen2.5-coder:7b}, context 16384 tokens.
+\end{paracol}
+
+\begin{longtable}{@{}K A B@{}}
+\hdr{Keys / Клавиши}{Что делает}{What it does}
+Space a & Открыть и закрыть чат & Open and close the chat \\
+V, j/k, Space c & Отправить выделенный код в чат & Send the selected code to the chat \\
+V, j/k, Space i & Правка выделенного кода по вашей задаче & Edit the selected code according to your task \\
+i, Ctrl+s & В чате: начать печатать и отправить вопрос & In the chat: start typing and send the question \\
+g2 / g3 / g1 & Принять / отклонить / всегда принимать правку & Accept / reject / always accept the edit \\
+ga & В чате: выбрать другую модель & In the chat: choose another model \\
+\end{longtable}
+
+\begin{paracol}{2}
+\RU
+Команды: \key{:CodeCompanionChat} (открыть чат), \key{:CodeCompanionChat Toggle}, \key{:CodeCompanionChat Add} (добавить выделение), \key{:CodeCompanion task text} (правка на месте; вместо \key{task text} напишите задачу).
+
+Клавиши \key{g1}, \key{g2}, \key{g3} и \key{ga} назначены самим плагином codecompanion.nvim; в других версиях плагина они могут быть другими.
+
+\textbf{Вопрос по коду.} Выделить код (\key{V}, \key{j}/\key{k}), \key{Space c}, \key{i}, вопрос, \key{Ctrl+s}. Ответ приходит через 10--20 секунд.
+
+\textbf{Правка кода.} Выделить код, \key{Space i}, написать задачу, Enter. Правка появится отдельным блоком: \key{g2} принять, \key{g3} отклонить. Результат всегда стоит просмотреть: 7B-модель иногда ошибается в деталях (например, ставит комментарий не туда).
+
+Совет: выделяйте нужную функцию, а не весь файл. Так ответы точнее, а контекст не переполняется. Проверка работы на видеокарте: \key{ollama ps} (должно быть \key{100\% GPU}).
+\switchcolumn
+\EN
+Commands: \key{:CodeCompanionChat} (open the chat), \key{:CodeCompanionChat Toggle}, \key{:CodeCompanionChat Add} (add the selection), \key{:CodeCompanion task text} (edit in place; write your task instead of \key{task text}).
+
+The keys \key{g1}, \key{g2}, \key{g3} and \key{ga} are assigned by the codecompanion.nvim plugin itself; other versions of the plugin may use different ones.
+
+\textbf{A question about code.} Select the code (\key{V}, \key{j}/\key{k}), \key{Space c}, \key{i}, the question, \key{Ctrl+s}. The answer arrives in 10--20 seconds.
+
+\textbf{Editing code.} Select the code, \key{Space i}, write the task, Enter. The edit appears as a separate block: \key{g2} accepts, \key{g3} rejects. Always review the result: a 7B model sometimes gets details wrong (for example, puts a comment in the wrong place).
+
+Tip: select the function you need rather than the whole file. Answers are more accurate and the context does not overflow. To check that it runs on the video card: \key{ollama ps} (it should say \key{100\% GPU}).
+\end{paracol}
+
+\section*{Диагностика и служебные команды / Diagnostics and utility commands}
+\begin{longtable}{@{}K A B@{}}
+\hdr{Command / Команда}{Что делает}{What it does}
+:checkhealth & Общая проверка состояния & General health check \\
+:checkhealth vim.lsp & Работают ли языковые серверы & Are the language servers working \\
+:checkhealth lazy & Состояние менеджера плагинов & Plugin manager state \\
+:checkhealth nvim-treesitter & Установленные парсеры подсветки & Installed highlighting parsers \\
+:checkhealth vim.provider & Проверка провайдеров (Python, Node и др.) & Provider check (Python, Node, etc.) \\
+:Inspect & Чем подсвечено слово под курсором (подтверждает работу Treesitter) & What highlights the word under the cursor (confirms Treesitter works) \\
+:set ft? & Какой тип файла определил Neovim & Which file type Neovim detected \\
+:TSInstall python & Установить парсер подсветки для языка (также rust, lua) & Install a highlighting parser for a language (also rust, lua) \\
+:Lazy & Окно менеджера плагинов; q закрывает его & Plugin manager window; q closes it \\
+\end{longtable}
+
+\section*{Команды PowerShell, которые использовались / PowerShell commands that were used}
+\begin{longtable}{@{}W E F@{}}
+\hdr{Command / Команда}{Зачем}{What for}
+nvim file & Открыть файл в Neovim & Open a file in Neovim \\
+nvim \$env:LOCALAPPDATA/nvim/lua/config/lsp.lua & Открыть файл конфигурации & Open a configuration file \\
+pwsh --version\newline rustc --version\newline cargo --version & Проверить установленные программы & Check installed programs \\
+rust-analyzer --version\newline pyright --version & Проверить языковые серверы & Check the language servers \\
+cargo new rust\_test & Создать тестовый проект на Rust & Create a test Rust project \\
+nvidia-smi & Объём видеопамяти и загрузка видеокарты & Video memory and GPU load \\
+ollama pull qwen2.5-coder:7b & Скачать модель & Download the model \\
+ollama run qwen2.5-coder:7b & Задать вопрос модели в терминале & Ask the model a question in the terminal \\
+ollama ps & Какие модели загружены и на чём работают & Which models are loaded and what they run on \\
+git init\newline git add .\newline git commit -m 'message' & Создать репозиторий и сохранить версию конфига & Create a repository and save a config version \\
+git log --oneline\newline git status & История и состояние репозитория & History and state of the repository \\
+\end{longtable}
+
+\needspace{12\baselineskip}
+\begin{paracol}{2}
+\RU
+\section*{Частые проблемы}
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{E37: No write since last change.} Файл не сохранён. Нажмите \key{:wq} или \key{:q!}.
+\item \textbf{E486: Pattern not found.} Искомого текста нет в текущем файле или окне. Часто поиск запускают не в том файле.
+\item \textbf{Чат или команды «ломаются».} Мешает Punto Switcher. Настройки, затем «Программы-исключения», добавить \key{WindowsTerminal.exe}.
+\item \textbf{Чат не даёт печатать.} Он открывается в обычном режиме. Нажмите \key{i}.
+\item \textbf{\key{:q} не закрывает окно при открытых чате или дереве.} Используйте \key{:qa!}.
+\item \textbf{Parser could not be created for language.} Не установлен парсер. Выполните \key{:TSInstall language}, подставив название языка.
+\item \textbf{Подсказок кода нет.} Подождите 10--30 секунд и выполните \key{:checkhealth vim.lsp}.
+\item \textbf{Ответ модели не приходит.} Проверьте, что Ollama запущена (значок в трее, \key{ollama ps}).
+\item \textbf{Сборка LaTeX не запускается: «could not find the script engine perl».} Не установлен Perl. См. инструкцию \key{install-markdown-latex}.
+\end{itemize}
+\switchcolumn
+\EN
+\section*{Common problems}
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{E37: No write since last change.} The file is not saved. Press \key{:wq} or \key{:q!}.
+\item \textbf{E486: Pattern not found.} The text is not in the current file or window. Often the search is started in the wrong file.
+\item \textbf{The chat or commands ``break''.} Punto Switcher interferes. Settings, then ``Exception programs'', add \key{WindowsTerminal.exe}.
+\item \textbf{The chat does not let you type.} It opens in normal mode. Press \key{i}.
+\item \textbf{\key{:q} does not close the window when the chat or the tree is open.} Use \key{:qa!}.
+\item \textbf{Parser could not be created for language.} The parser is not installed. Run \key{:TSInstall language}, replacing it with the language name.
+\item \textbf{No code hints.} Wait 10--30 seconds and run \key{:checkhealth vim.lsp}.
+\item \textbf{No reply from the model.} Check that Ollama is running (the tray icon, \key{ollama ps}).
+\item \textbf{The LaTeX build does not start: ``could not find the script engine perl''.} Perl is not installed. See the guide \key{install-markdown-latex}.
+\end{itemize}
+\end{paracol}
+
+\end{document}
