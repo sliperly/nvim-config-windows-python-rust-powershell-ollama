@@ -86,7 +86,7 @@ If the config was taken from the repository (options A and B of the base guide),
 
 The block for Mason (the server manager):
 
-```powershell
+```lua
 {
   "mason-org/mason.nvim",
   opts = {},
@@ -157,7 +157,7 @@ A `.tex` file should show `texlab`, a `.md` file `marksman`.
 
 Nice rendering is done by the render-markdown.nvim plugin. It turns on by itself for Markdown files:
 
-```powershell
+```lua
 {
   "MeanderingProgrammer/render-markdown.nvim",
   ft = "markdown",

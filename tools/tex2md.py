@@ -85,6 +85,8 @@ def inline(t, lang):
 def fence_lang(code):
     if re.search(r"^\s*(vim\.|local |require\()", code, re.M):
         return "lua"
+    if code.lstrip().startswith("{"):
+        return "lua"
     if re.search(r"^\\documentclass", code, re.M):
         return "latex"
     if re.match(r"^\s*(:|\\)", code) or code.lstrip().startswith(":"):
@@ -109,9 +111,8 @@ ENV = re.compile(
 
 def convert_text(t, lang):
     """Convert one chunk of prose/environments to Markdown."""
-    t = re.sub(r"(?<!\\)%.*", "", t)  # comments
-    t = re.sub(r"\\(begingroup|endgroup)\b|\\(hyphenpenalty|exhyphenpenalty)=\d+ ?", "", t)
-    t = re.sub(r"\{\\Large\\bfseries (.*?)\\par\}", lambda m: f"\n\n# {m.group(1)}\n\n", t, flags=re.S)
+    t = re.sub(r"\\(begingroup|endgroup|raggedright)\b|\\(hyphenpenalty|exhyphenpenalty)=\d+ ?", "", t)
+    t = re.sub(r"\{\\Large\\bfseries (.*?)\\par\}", lambda m: "\n\n# " + m.group(1).replace("\\\\", " ") + "\n\n", t, flags=re.S)
     t = re.sub(r"\\needspace\{[^}]*\}|\\(wide|narrow|sloppy|par)\b", "", t)
     out, pos = [], 0
     blocks = []
@@ -133,6 +134,7 @@ def convert_text(t, lang):
         return stash("\n".join(lines))
 
     t = ENV.sub(repl, t)
+    t = re.sub(r"(?<!\\)%.*", "", t)  # comments (after code blocks are stashed: '%' is code there)
 
     # headings and title
     t = replace_cmd(t, "section*", lambda c: f"\n\n## {inline(c, lang)}\n\n")

@@ -267,10 +267,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 local pses = vim.fs.normalize(vim.fn.stdpath('data') .. '/pses')
 local cache = vim.fs.normalize(vim.fn.stdpath('cache'))
 local pses_cmd = string.format(
-  "& '
-    .. "-BundledModulesPath '
-    .. "-LogPath '
-    .. "-SessionDetailsPath '
+  "& '%s/PowerShellEditorServices/Start-EditorServices.ps1' "
+    .. "-BundledModulesPath '%s' "
+    .. "-LogPath '%s/powershell_es.log' "
+    .. "-SessionDetailsPath '%s/powershell_es.session.json' "
     .. "-FeatureFlags @() -AdditionalModules @() "
     .. "-HostName nvim -HostProfileId 0 -HostVersion 1.0.0 "
     .. "-Stdio -LogLevel Normal",

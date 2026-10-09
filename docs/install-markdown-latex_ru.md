@@ -86,7 +86,7 @@ xelatex test.tex
 
 Блок для Mason (менеджера серверов):
 
-```powershell
+```lua
 {
   "mason-org/mason.nvim",
   opts = {},
@@ -157,7 +157,7 @@ vim.lsp.enable('marksman')
 
 За красивое отображение отвечает плагин render-markdown.nvim. Он включается сам для файлов Markdown:
 
-```powershell
+```lua
 {
   "MeanderingProgrammer/render-markdown.nvim",
   ft = "markdown",
